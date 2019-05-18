@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <!-- This is an example for providing an own category 
+      <extension
+         point="org.knime.workbench.repository.categories">
+      <category
+            description="Category containing my nodes"
+            icon="icons/default.png"
+            level-id="myNodes"
+            name="My nodes"
+            path="/"/>
+   </extension>
+   -->
+   
+   <extension
+         point="org.knime.workbench.repository.nodes">
+      <node
+            category-path="/UoRNodes"
+            factory-class="uk.ac.reading.cs.knime.kmeans.KMeansWSSNodeFactory"
+            id="uk.ac.reading.cs.knime.kmeans.KMeansWSSNodeFactory"/>
+   </extension>
+   <extension
+         point="org.knime.workbench.repository.categories">
+      <category
+            icon="bin/uk/ac/reading/cs/knime/kmeans/UoR-13x16.png"
+            level-id="UoRNodes"
+            locked="true"
+            name="UoR"
+            path="/">
+      </category>
+   </extension>
+   
+</plugin>
