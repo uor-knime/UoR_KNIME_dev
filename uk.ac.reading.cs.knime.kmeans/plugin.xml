@@ -2,7 +2,7 @@
 <?eclipse version="3.0"?>
 <plugin>
 
-   <!-- This is an example for providing an own category 
+   <!-- This is an example for providing an own category
       <extension
          point="org.knime.workbench.repository.categories">
       <category
@@ -13,13 +13,12 @@
             path="/"/>
    </extension>
    -->
-   
+
    <extension
          point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/UoRNodes"
-            factory-class="uk.ac.reading.cs.knime.kmeans.KMeansWSSNodeFactory"
-            id="uk.ac.reading.cs.knime.kmeans.KMeansWSSNodeFactory"/>
+            category-path="/community/UoRNodes"
+            factory-class="uk.ac.reading.cs.knime.kmeans.KMeansWSSNodeFactory" />
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
@@ -28,8 +27,8 @@
             level-id="UoRNodes"
             locked="true"
             name="UoR"
-            path="/">
+            path="/community">
       </category>
    </extension>
-   
+
 </plugin>

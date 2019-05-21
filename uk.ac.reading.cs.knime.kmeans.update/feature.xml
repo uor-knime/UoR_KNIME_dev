@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="uk.ac.reading.cs.knime.kmeans.update"
+      label="UoR Update"
+      version="1.0.5.qualifier"
+      provider-name="University of Reading">
+
+   <license url="">
+      
+   </license>
+
+   <includes
+         id="uk.ac.reading.cs.knime.kmeans.feature"
+         version="0.0.0"/>
+
+</feature>

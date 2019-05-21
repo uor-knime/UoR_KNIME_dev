@@ -7,8 +7,6 @@ import org.knime.core.node.NodeView;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
@@ -37,7 +35,7 @@ import org.knime.core.node.property.hilite.KeyEvent;
  * Implementation of the k-Means clustering algorithm returning the validity measure WSS and BSS.
  *
  * modified by: Giuseppe Di Fatta
- * 
+ *
  * @author Michael Berthold, University of Konstanz
  */
 public class KMeansWSSNodeView extends NodeView<KMeansWSSNodeModel>
@@ -121,37 +119,13 @@ public class KMeansWSSNodeView extends NodeView<KMeansWSSNodeModel>
     private JMenu getHiLiteMenu() {
         JMenu menu = new JMenu("Hilite");
         JMenuItem item = new JMenuItem(HILITE);
-        item.addActionListener(new ActionListener() {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                getNodeModel().getHiLiteHandler().fireHiLiteEvent(m_selected);
-            }
-        });
+        item.addActionListener(arg0 -> getNodeModel().getHiLiteHandler().fireHiLiteEvent(m_selected));
         menu.add(item);
         item = new JMenuItem(UNHILITE);
-        item.addActionListener(new ActionListener() {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                getNodeModel().getHiLiteHandler().fireUnHiLiteEvent(m_selected);
-            }
-        });
+        item.addActionListener(arg0 -> getNodeModel().getHiLiteHandler().fireUnHiLiteEvent(m_selected));
         menu.add(item);
         item = new JMenuItem(UNHILITE_ALL);
-        item.addActionListener(new ActionListener() {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                getNodeModel().getHiLiteHandler().fireClearHiLiteEvent();
-            }
-        });
+        item.addActionListener(arg0 -> getNodeModel().getHiLiteHandler().fireClearHiLiteEvent());
         menu.add(item);
         return menu;
     }
@@ -159,42 +133,13 @@ public class KMeansWSSNodeView extends NodeView<KMeansWSSNodeModel>
     private void openPopupMenu(final MouseEvent e) {
         JPopupMenu menu = new JPopupMenu();
         JMenuItem item = new JMenuItem(HILITE);
-        item.addActionListener(new ActionListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                getNodeModel().getHiLiteHandler().fireHiLiteEvent(m_selected);
-            }
-
-        });
+        item.addActionListener(arg0 -> getNodeModel().getHiLiteHandler().fireHiLiteEvent(m_selected));
         menu.add(item);
         item = new JMenuItem(UNHILITE);
-        item.addActionListener(new ActionListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                getNodeModel().getHiLiteHandler().fireUnHiLiteEvent(m_selected);
-            }
-
-        });
+        item.addActionListener(arg0 -> getNodeModel().getHiLiteHandler().fireUnHiLiteEvent(m_selected));
         menu.add(item);
         item = new JMenuItem(UNHILITE_ALL);
-        item.addActionListener(new ActionListener() {
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                getNodeModel().getHiLiteHandler().fireClearHiLiteEvent();
-            }
-        });
+        item.addActionListener(arg0 -> getNodeModel().getHiLiteHandler().fireClearHiLiteEvent());
         menu.add(item);
         menu.show(e.getComponent(), e.getX(), e.getY());
     }
