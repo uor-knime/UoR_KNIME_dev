@@ -6,7 +6,14 @@
       provider-name="University of Reading">
 
    <description>
-      Enter feature description
+      This extension provides a KNIME node with the standard k-means algorithm for cluster analysis. The node also computes and returns two internal validity
+indices: the Within-cluster Sum of Squares (WSS) and the Between-cluster
+Sum of Squares (BSS). WSS is the total distance of each data
+point from its cluster centroids: it is the objective function
+that k-means minimises. BSS is the total weighted distance of
+each cluster centroid from the global mean of all data. WSS is
+a measure of how compact the clusters are. BSS is a measure of
+how separated the clusters are.
    </description>
 
    <license url="">
