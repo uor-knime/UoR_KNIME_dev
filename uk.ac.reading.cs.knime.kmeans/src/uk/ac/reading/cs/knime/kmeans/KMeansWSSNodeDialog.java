@@ -7,6 +7,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
+import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 
 /**
@@ -29,10 +30,19 @@ public class KMeansWSSNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     KMeansWSSNodeDialog() {
         super();
+        SettingsModelBoolean smb = new SettingsModelBoolean(
+        		KMeansWSSNodeModel.CFG_USE_RANDOM_SEED, 
+        		KMeansWSSNodeModel.INITIAL_USE_RAN_SEED);
+        SettingsModelInteger smi = new SettingsModelInteger(
+        		KMeansWSSNodeModel.CFG_RANDOM_NUMBERS_SEED, 
+        		KMeansWSSNodeModel.INITIAL_RAN_NUM_SEED);
         SettingsModelIntegerBounded smib = new SettingsModelIntegerBounded(
         		KMeansWSSNodeModel.CFG_NR_OF_CLUSTERS,
         		KMeansWSSNodeModel.INITIAL_NR_CLUSTERS,
                 1, Integer.MAX_VALUE);
+        DialogComponentBoolean useRanSeed = new DialogComponentBoolean(smb, "use a random seed: ");
+        DialogComponentNumber ranNumSeed = new DialogComponentNumber(
+                smi, "or use a fixed seed for random initial centroids: ", 1);
         DialogComponentNumber nrOfClusters = new DialogComponentNumber(
             smib, "number of clusters: ", 1, createFlowVariableModel(smib));
         DialogComponentNumber maxNrOfIterations = new DialogComponentNumber(
@@ -50,6 +60,8 @@ public class KMeansWSSNodeDialog extends DefaultNodeSettingsPane {
 
         addDialogComponent(nrOfClusters);
         addDialogComponent(maxNrOfIterations);
+        addDialogComponent(useRanSeed);
+        addDialogComponent(ranNumSeed);
         addDialogComponent(columnFilter);
         addDialogComponent(enableHilite);
         setDefaultTabTitle("K-Means Properties");

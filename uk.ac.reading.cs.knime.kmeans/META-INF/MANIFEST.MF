@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KMeans Cluster
+Bundle-Name: k-MeansWSS
 Bundle-SymbolicName: uk.ac.reading.cs.knime.kmeans;singleton:=true
-Bundle-Version: 1.0.5.qualifier
+Bundle-Version: 1.0.6.qualifier
 Bundle-ClassPath: kmeanswss.jar
 Bundle-Activator: uk.ac.reading.cs.knime.kmeans.KMeansWSSNodePlugin
 Bundle-Vendor: University of Reading

@@ -1,24 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <knimeNode icon="./kmeansWSS.png" type="Learner" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
-    <name>KMeansWSS</name>
+    <name>k-MeansWSS</name>
     
     <shortDescription>
-        Implementation of the k-Means clustering algorithm returning the validity measure WSS and BSS.
+        Implementation of the k-Means clustering algorithm returning the internal 
+        validity measures WSS and BSS.
     </shortDescription>
     
     <fullDescription>
         <intro>
-			This node outputs the cluster centers for a predefined number of
-			clusters (no dynamic number of clusters).
+            This node provides the standard k-means algorithm for cluster analysis.
+            The user must specify the number (k) of clusters. The algorithms 
+            initialises the set of centroids with k random input data and iteratively 
+            changes them to minimise the sum of squared distances from each point to 
+            its closest centroid.
+            <br />
+            This node also computes two internal validity indices: the Within-cluster 
+        	Sum of Squares (WSS) and the Between-cluster Sum of Squares (BSS). 
+        	WSS (aka SSE) is the total distance of each data point from its cluster centroids: 
+        	it is the objective function that k-means minimises. BSS is the total 
+    	    weighted distance of each cluster centroid from the global mean of all data. 
+ 	        WSS is a measure of how compact the clusters are. BSS is a measure of how 
+            separated the clusters are.
+		    <br />
 			K-means performs a crisp clustering that assigns a data
-			vector to exactly one cluster. The algorithm terminates when the
-			cluster assignments do not change anymore.<br />
+			record (row) to exactly one cluster: partitional clustering. 
+			The algorithm terminates when the cluster assignments do not change anymore.
+			<br />
 			The clustering algorithm uses the Euclidean distance on the selected
 			attributes. The data is not normalized by the node (if required,
-			you should consider to use the "Normalizer" as a preprocessing step).<br/>  
+			you should consider to use the "Normalizer" as a preprocessing step).
+			<br /> 
 			If the optional PMML inport is connected and contains 
             preprocessing operations in the TransformationDictionary those are 
             added to the learned model.
+			<br />
+			This node outputs (1) the input data with the assigned cluser ID, 
+			(2) cluster centers (descriptive data model) and (3) the two validity measures.
+			<br />
+			<br />
 			The node can be configured as follows:
 		</intro>
 		<option name="number of clusters">
@@ -26,7 +46,7 @@
 	    </option>
 		<option name="max number of iterations">
 		    The number of iterations after which the algorithm terminates,
-			independent of the accuracy improvement of the cluster centers.
+			independent of the accuracy improvement of the cluster centers (centroids).
 		</option>
 	</fullDescription>
     

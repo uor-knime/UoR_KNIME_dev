@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.knime.base.node.mine.cluster.PMMLClusterTranslator;
 import org.knime.base.node.mine.cluster.PMMLClusterTranslator.ComparisonMeasure;
@@ -45,6 +47,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
+import org.knime.core.node.defaultnodesettings.SettingsModelInteger;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -83,8 +86,16 @@ public class KMeansWSSNodeModel extends NodeModel {
     public static final int INITIAL_NR_CLUSTERS = 3;
 
     /** Constant for the initial number of iterations used in the dialog. */
+    public static final int INITIAL_RAN_NUM_SEED = 1234567890;
+    public static final boolean INITIAL_USE_RAN_SEED = false;
+    
+    /** Constant for the initial number of iterations used in the dialog. */
     public static final int INITIAL_MAX_ITERATIONS = 99;
 
+    /** Config key for the seed of the random number generator. */
+    public static final String CFG_RANDOM_NUMBERS_SEED = "randomNumbersSeed"; //use a fixed user-defined seed
+    public static final String CFG_USE_RANDOM_SEED = "useRandomSeed"; //use a random seed
+    
     /** Config key for the number of clusters. */
     public static final String CFG_NR_OF_CLUSTERS = "nrClusters";
 
@@ -142,6 +153,14 @@ public class KMeansWSSNodeModel extends NodeModel {
 
     private boolean m_pmmlInEnabled;
     private boolean m_outputCenters;
+    
+//    private int m_randomSeed;
+    private final SettingsModelInteger m_seed
+    	= new SettingsModelInteger(CFG_RANDOM_NUMBERS_SEED, INITIAL_RAN_NUM_SEED);
+    private final SettingsModelBoolean m_use_a_random_Seed
+		= new SettingsModelBoolean(CFG_USE_RANDOM_SEED, INITIAL_USE_RAN_SEED);
+
+    
 
     /**
      * Constructor, remember parent and initialize status.
@@ -162,6 +181,7 @@ public class KMeansWSSNodeModel extends NodeModel {
         : new PortType[]{BufferedDataTable.TYPE, PMMLPortObject.TYPE, BufferedDataTable.TYPE});
         m_pmmlInEnabled = pmmlInEnabled;
         m_outputCenters = outputCenters;
+//        m_randomSeed = (int)System.currentTimeMillis();
     }
 
 
@@ -209,6 +229,8 @@ public class KMeansWSSNodeModel extends NodeModel {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         assert (settings != null);
+        m_use_a_random_Seed.saveSettingsTo(settings);
+        m_seed.saveSettingsTo(settings);
         m_nrOfClusters.saveSettingsTo(settings);
         m_nrMaxIterations.saveSettingsTo(settings);
         m_usedColumns.saveSettingsTo(settings);
@@ -227,6 +249,8 @@ public class KMeansWSSNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         assert (settings != null);
+        m_use_a_random_Seed.validateSettings(settings);
+        m_seed.validateSettings(settings);
         m_nrOfClusters.validateSettings(settings);
         m_nrMaxIterations.validateSettings(settings);
         // if exception is thrown -> catch it, and remember it
@@ -251,6 +275,8 @@ public class KMeansWSSNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         assert (settings != null);
+        m_seed.loadSettingsFrom(settings);
+        m_use_a_random_Seed.loadSettingsFrom(settings);
         m_nrOfClusters.loadSettingsFrom(settings);
         m_nrMaxIterations.loadSettingsFrom(settings);
         m_dimension = m_usedColumns.getIncludeList().size() + m_usedColumns.getExcludeList().size();
@@ -279,11 +305,13 @@ public class KMeansWSSNodeModel extends NodeModel {
         // FIXME actually do something useful with missing values!
         BufferedDataTable inData = (BufferedDataTable)data[0];
         DataTableSpec spec = inData.getDataTableSpec();
+        long nRows = inData.size(); //alt. ConvenienceMethods.checkTableSize(inData);
+
         // get dimension of feature space
         m_dimension = inData.getDataTableSpec().getNumColumns();
         HashMap<RowKey, Set<RowKey>> mapping = new HashMap<RowKey, Set<RowKey>>();
         addExcludeColumnsToIgnoreList(spec);
-        double[][] clusters = initializeClusters(inData);
+        double[][] clusters = initializeClusters(inData, nRows);
 
         // also keep counts of how many patterns fall in a specific cluster
         int[] clusterCoverage = new int[m_nrOfClusters.getIntValue()];
@@ -514,33 +542,85 @@ public class KMeansWSSNodeModel extends NodeModel {
         return finished;
     }
 
-    private double[][] initializeClusters(final DataTable input) {
-        // initialize matrix of double (nr clusters * input dimension)
+    private double[][] initializeClusters(final DataTable input, long numRows) {
+    	// initialize matrix of double (nr clusters * input dimension)
         double[][] clusters = new double[m_nrOfClusters.getIntValue()][];
         for (int c = 0; c < m_nrOfClusters.getIntValue(); c++) {
             clusters[c] = new double[m_dimension - m_nrIgnoredColumns];
         }
+        
+        // init: first k rows
         // initialize cluster centers with values of first rows in table
-        RowIterator rowIt = input.iterator();
-        int c = 0;
-        while (rowIt.hasNext() && c < m_nrOfClusters.getIntValue()) {
-            DataRow currentRow = rowIt.next();
-            int pos = 0;
-            for (int i = 0; i < currentRow.getNumCells(); i++) {
-                if (!m_ignoreColumn[i]) {
-                    if (currentRow.getCell(i).isMissing()) {
-                        clusters[c][pos] = 0;
-                        // missing value: replace with zero
-                    } else {
-                        assert currentRow.getCell(i).getType().isCompatible(DoubleValue.class);
-                        DoubleValue currentValue = (DoubleValue)currentRow.getCell(i);
-                        clusters[c][pos] = currentValue.getDoubleValue();
-                    }
-                    pos++;
-                }
-            }
-            c++;
+//        RowIterator rowIt = input.iterator();
+//        int c = 0;
+//        while (rowIt.hasNext() && c < m_nrOfClusters.getIntValue()) {
+//            DataRow currentRow = rowIt.next();
+//            int pos = 0;
+//            for (int i = 0; i < currentRow.getNumCells(); i++) {
+//                if (!m_ignoreColumn[i]) {
+//                    if (currentRow.getCell(i).isMissing()) {
+//                        clusters[c][pos] = 0;
+//                        // missing value: replace with zero
+//                    } else {
+//                        assert currentRow.getCell(i).getType().isCompatible(DoubleValue.class);
+//                        DoubleValue currentValue = (DoubleValue)currentRow.getCell(i);
+//                        clusters[c][pos] = currentValue.getDoubleValue();
+//                    }
+//                    pos++;
+//                }
+//            }
+//            c++;
+//        }
+
+        // init: random k rows
+        // initialize cluster centers with values of k random rows in table
+        int nRows = Integer.MAX_VALUE; //needed for bounded rand.nextInt()
+        if(numRows < Integer.MAX_VALUE)
+        	nRows = (int) numRows;
+        
+        if(m_use_a_random_Seed.getBooleanValue()){
+        	m_seed.setIntValue((int)System.currentTimeMillis());
+            NodeLogger.getLogger(getClass()).info("Using a randomly generated seed '" + m_seed + "' for random init of centroids.");
+        } else {
+            NodeLogger.getLogger(getClass()).info("Using the fixed seed '" + m_seed + "' for random init of centroids.");
         }
+        Random rand = new Random(m_seed.getIntValue());
+        
+        TreeSet<Long> chosenIdx = new TreeSet<Long>();
+        while (chosenIdx.size() < m_nrOfClusters.getIntValue()) {
+        	chosenIdx.add((long) rand.nextInt(nRows));
+        }
+        Long chosen[] = chosenIdx.toArray(new Long[0]);
+        NodeLogger.getLogger(getClass()).info("Using these rows for the initial centroids: " + chosenIdx);
+        
+        RowIterator rowIt = input.iterator();
+        int numCentres = 0;
+        long nRow = 0;
+        while (rowIt.hasNext() && numCentres < m_nrOfClusters.getIntValue()) {
+            DataRow currentRow = rowIt.next();
+            
+            if(chosen[numCentres] == nRow){
+	            int pos = 0;
+	            for (int i = 0; i < currentRow.getNumCells(); i++) {
+	                if (!m_ignoreColumn[i]) {
+	                    if (currentRow.getCell(i).isMissing()) {
+	                        clusters[numCentres][pos] = 0;
+	                        // missing value: replace with zero
+	                    } else {
+	                        assert currentRow.getCell(i).getType().isCompatible(DoubleValue.class);
+	                        DoubleValue currentValue = (DoubleValue)currentRow.getCell(i);
+	                        clusters[numCentres][pos] = currentValue.getDoubleValue();
+	                    }
+	                    pos++;
+	                }
+	            }
+	            numCentres++;
+        	}
+            nRow++;
+        }
+        
+        
+        
         return clusters;
     }
 
