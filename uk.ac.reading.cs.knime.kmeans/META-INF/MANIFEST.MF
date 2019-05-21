@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
+Bundle-Name: KMeans Cluster
 Bundle-SymbolicName: uk.ac.reading.cs.knime.kmeans;singleton:=true
-Bundle-Version: 1.0.5
+Bundle-Version: 1.0.5.qualifier
 Bundle-ClassPath: kmeanswss.jar
 Bundle-Activator: uk.ac.reading.cs.knime.kmeans.KMeansWSSNodePlugin
-Bundle-Vendor: %Bundle-Vendor
+Bundle-Vendor: University of Reading
 Require-Bundle: org.eclipse.core.runtime,
  org.knime.workbench.core,
  org.knime.workbench.repository,

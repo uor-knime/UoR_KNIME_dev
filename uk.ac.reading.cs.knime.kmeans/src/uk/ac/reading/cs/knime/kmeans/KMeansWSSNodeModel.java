@@ -59,16 +59,16 @@ import org.knime.core.node.property.hilite.HiLiteTranslator;
 /**
  * This is the model implementation of KMeansWSS.
  * Implementation of the k-Means clustering algorithm returning the validity measure WSS and BSS.
- * 
+ *
  * @author Giuseppe Di Fatta, University of Reading
- * 
+ *
  * <br>
  * <br>
- * This node is based on the source code of the original k-Means node implementation 
+ * This node is based on the source code of the original k-Means node implementation
  * from org\knime\base\node\mine\cluster\kmeans.
  *
  * <br>
- * 
+ *
  * Generate a clustering using a fixed number of cluster centers and the k-means
  * algorithm. Right now this works only on {@link DataTable}s holding
  * {@link org.knime.core.data.def.DoubleCell}s (or derivatives thereof).
@@ -346,7 +346,7 @@ public class KMeansWSSNodeModel extends NodeModel {
             finished = updateClusterCenters(clusterCoverage, clusters, delta);
             currentIteration++;
         } // while(!finished & nrIt<maxNrIt)
-        
+
         //compute WSS and BSS
         double wss = 0.0; //SSE
         double theCentre[] = new double[m_dimension];
@@ -365,13 +365,14 @@ public class KMeansWSSNodeModel extends NodeModel {
                 // otherwise just don't reproduce result
                 throw new IllegalStateException("No winnerDist found: " + winnerDist2);
             }
-            
+
             int pos = 0;
             for (int i = 0; i < m_dimension; i++) {
                 DataCell currentCell = currentRow.getCell(i);
-                
+
                 if (!m_ignoreColumn[i]) {
                 	if(i==0) cnt++;
+
                     if (!currentCell.isMissing()) {
                         assert currentCell.getType().isCompatible(DoubleValue.class);
                         double d = ((DoubleValue)(currentCell)).getDoubleValue();
@@ -394,7 +395,7 @@ public class KMeansWSSNodeModel extends NodeModel {
         	LOGGER.info("<KMeansWSSNodeModel> the number of data points in cluster <"+c+"> is  " + clusterCoverage[c]);
         }
         LOGGER.info("<KMeansWSSNodeModel> in total "+cnt+" data points: WSS = " + wss + " and BSS = " + bss);
-        
+
         // create list of feature names
         int k = 0;  // index of not-ignored columns
         int j = 0;  // index of column
@@ -406,7 +407,7 @@ public class KMeansWSSNodeModel extends NodeModel {
             }
             j++;
         } while (j < m_dimension);
-        
+
         // create output container and also mapping for HiLiteing
         BufferedDataContainer labeledInput = exec.createDataContainer(createAppendedSpec(spec));
         for (DataRow row : inData) {
@@ -429,7 +430,7 @@ public class KMeansWSSNodeModel extends NodeModel {
             m_translator.setMapper(new DefaultHiLiteMapper(mapping));
         }
         BufferedDataTable outData = labeledInput.getTable();
-        
+
         //create datatable for validity measures
         BufferedDataContainer container = exec.createDataContainer(getValidityTableSpec());
         addRow(container, wss, bss);
@@ -479,13 +480,13 @@ public class KMeansWSSNodeModel extends NodeModel {
 
 		return crator.createSpec();
 	}
-    
+
     private void addRow(BufferedDataContainer container, double wss, double bss) {
 		container.addRowToTable(
-				new DefaultRow(new RowKey("validity"), new DataCell[] { 
+				new DefaultRow(new RowKey("validity"), new DataCell[] {
 						DoubleCellFactory.create(wss), DoubleCellFactory.create(bss) }));
 	}
-    
+
     private boolean updateClusterCenters(final int[] clusterCoverage,
                                         final double[][] clusters,
                                         final double[][] delta) {
@@ -601,7 +602,7 @@ public class KMeansWSSNodeModel extends NodeModel {
 //        } // for all clusters (find closest one)
 //        return winner;
 //    }
-    
+
     private double getClosestPrototypeDist2(final DataRow row, final double[][] clusters) {
         // find closest cluster center
         int winner = -1; // closest cluster so far
@@ -631,7 +632,7 @@ public class KMeansWSSNodeModel extends NodeModel {
         } // for all clusters (find closest one)
         return winnerDistance2;
     }
-    
+
     private double getBSS2(double[] centre, final double[][] clusters, int clusterCoverage[]) {
         // find BSS for cluster centers
         double bss = 0.0;
@@ -772,7 +773,7 @@ public class KMeansWSSNodeModel extends NodeModel {
             return new PortObjectSpec[]{appendedSpec, createPMMLSpec(pmmlSpec, spec), createValiditySpec()};
         }
     }
-    
+
     private DataTableSpec createValiditySpec() {
      // Create spec for validity measures table
         DataTableSpecCreator valSpecCreator = new DataTableSpecCreator();
