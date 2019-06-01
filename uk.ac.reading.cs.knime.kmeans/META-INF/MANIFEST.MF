@@ -7,9 +7,9 @@ Bundle-ClassPath: kmeanswss.jar
 Bundle-Activator: uk.ac.reading.cs.knime.kmeans.KMeansWSSNodePlugin
 Bundle-Vendor: University of Reading
 Require-Bundle: org.eclipse.core.runtime,
- org.knime.workbench.core,
- org.knime.workbench.repository,
- org.knime.base;bundle-version="3.8.0"
+ org.knime.workbench.core;bundle-version="[3.7.0,4.0.0)",
+ org.knime.workbench.repository;bundle-version="[3.7.0,4.0.0)",
+ org.knime.base;bundle-version="[3.7.0,4.0.0)"
 Bundle-ActivationPolicy: lazy
 Export-Package: uk.ac.reading.cs.knime.kmeans
 
