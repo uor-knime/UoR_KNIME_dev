@@ -16,19 +16,11 @@ a measure of how compact the clusters are. BSS is a measure of
 how separated the clusters are.
    </description>
 
-   <license url="">
-      GNU GENERAL PUBLIC LICENSE with Additional Permissions according to Sec. 7
-*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** 
-Please see below the General Public License (GPL), Version 3, 
-and the Additional Permissions according to Sec. 7 
-applying to the files in this folder:
 
-*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** 
+   <license url="http://www.gnu.org/licenses/gpl-3.0.html">
+GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 
-                    GNU GENERAL PUBLIC LICENSE
-                       Version 3, 29 June 2007
-
- Copyright (C) 2007 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+ Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
